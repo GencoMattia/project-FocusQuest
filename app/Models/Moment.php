@@ -19,4 +19,8 @@ class Moment extends Model
     public function emotion(){
         return $this->belongsTo(Emotion::class);
     }
+
+    public function tasks(){
+        return $this->belongsToMany(Task::class);
+    }
 }

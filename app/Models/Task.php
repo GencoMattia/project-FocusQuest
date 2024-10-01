@@ -33,4 +33,8 @@ class Task extends Model
     public function status(){
         return $this->hasOne(Status::class);
     }
+
+    public function moments(){
+        return $this->hasMany(Moment::class);
+    }
 }
