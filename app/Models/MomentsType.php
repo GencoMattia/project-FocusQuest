@@ -12,4 +12,8 @@ class MomentsType extends Model
     protected $fillable = [
         'name'
     ];
+
+    public function moments(){
+        return $this->belongsToMany(Moment::class);
+    }
 }

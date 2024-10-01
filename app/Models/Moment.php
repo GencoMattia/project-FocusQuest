@@ -11,4 +11,8 @@ class Moment extends Model
     protected $fillable = [
         'name', 'message', 'started_at', 'ended_at', 'moment_img'
     ];
+
+    public function momentstype(){
+        return $this->hasOne(MomentsType::class);
+    }
 }
