@@ -24,18 +24,18 @@ class Task extends Model
     }
 
     public function category(){
-        return $this->hasOne(Category::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function priority(){
-        return $this->hasOne(Priority::class);
+        return $this->belongsTo(Priority::class);
     }
 
     public function status(){
-        return $this->hasOne(Status::class);
+        return $this->belongsTo(Status::class);
     }
 
     public function moments(){
-        return $this->hasMany(Moment::class);
+        return $this->belongsToMany(Moment::class, 'moment_task');
     }
 }
