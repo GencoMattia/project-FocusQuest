@@ -18,6 +18,7 @@ return new class extends Migration
                 ->nullOnDelete();
 
                 $table->foreignId('task_id')->nullable()->constrained()
+
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
 
