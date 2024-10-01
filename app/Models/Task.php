@@ -14,4 +14,8 @@ class Task extends Model
     protected $fillable = [
         'name', 'description', 'deadline', 'estimated_time', 'effective_time'
     ];
+
+    public function user(){
+        return $this->belongsTo('user');
+    }
 }
