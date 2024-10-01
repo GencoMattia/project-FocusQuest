@@ -11,4 +11,8 @@ class Emotion extends Model
     protected $fillable = [
         'name', 'icon', 'color'
     ];
+
+    public function moments(){
+        return $this->hasMany(Moment::class);
+    }
 }

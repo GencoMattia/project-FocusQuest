@@ -14,6 +14,6 @@ class MomentsType extends Model
     ];
 
     public function moments(){
-        return $this->belongsToMany(Moment::class);
+        return $this->hasMany(Moment::class);
     }
 }

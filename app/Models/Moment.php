@@ -13,6 +13,10 @@ class Moment extends Model
     ];
 
     public function momentstype(){
-        return $this->hasOne(MomentsType::class);
+        return $this->belongsTo(MomentsType::class);
+    }
+
+    public function emotion(){
+        return $this->belongsTo(Emotion::class);
     }
 }
