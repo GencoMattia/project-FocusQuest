@@ -13,6 +13,8 @@ class Task extends Model
 
     protected $fillable = [
         'user_id',
+        'category_id',
+        'priority_id',
         'name', 'description', 'deadline', 'estimated_time', 'effective_time'
     ];
 
@@ -22,5 +24,9 @@ class Task extends Model
 
     public function category(){
         return $this->hasOne(Category::class);
+    }
+
+    public function priority(){
+        return $this->hasOne(Priority::class);
     }
 }

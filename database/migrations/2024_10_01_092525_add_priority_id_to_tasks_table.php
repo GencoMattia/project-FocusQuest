@@ -12,11 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            $table->foreignId('category_id')->nullable()
-                ->after('user_id')
+            $table->foreignId('priority_id')->nullable()
+                ->after('category_id')
                 ->constrained()
                 ->cascadeOnUpdate()
                 ->nullOnDelete();
+                // ->onDelete('null');
         });
     }
 
@@ -26,8 +27,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            $table->dropForeign(['category_id']);
-            $table->dropColumn('category_id');
+            $table->dropForeign(['priority_id']);
+            $table->dropColumn('priority_id');
         });
     }
 };

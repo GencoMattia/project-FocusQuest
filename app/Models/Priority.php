@@ -12,4 +12,8 @@ class Priority extends Model
     protected $fillable =[
         'name', 'color', 'level', 'description'
     ];
+
+    public function categories(){
+        return $this->belongsToMany(Task::class);
+    }
 }
