@@ -11,13 +11,15 @@ class MomentTaskSeeder extends Seeder
     public function run()
     {
         // Assumendo che ci siano già dei momenti e dei task nel database
-        $moments_id = Moment::all()->pluck('id');
-        $tasks_id = Task::all()->pluck('id');
+        $moments = Moment::all();
+        $tasks = Task::all();
 
-        foreach ($tasks_id as $singleTask) {
-            foreach ($moments_id as $singleMoment) {
-                $singleTask->attach($singleMoment);
+        foreach ($tasks as $task) {
+            foreach ($moments as $moment) {
+                // Associa il momento al task
+                $task->moments()->attach($moment->id);
             }
         }
     }
+
 }
