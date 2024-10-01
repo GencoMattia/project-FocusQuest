@@ -2,16 +2,15 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\MomentsType;
 
 class MomentsTypeSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
+    public function run()
     {
-        //
+        MomentsType::create(['name' => 'Tipologia 1']);
+        MomentsType::create(['name' => 'Tipologia 2']);
+        MomentsType::create(['name' => 'Tipologia 3']);
     }
 }
