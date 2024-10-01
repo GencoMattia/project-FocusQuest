@@ -9,6 +9,8 @@ class Moment extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'moments_type_id',
+        'emotion_id',
         'name', 'message', 'started_at', 'ended_at', 'moment_img'
     ];
 
