@@ -29,4 +29,8 @@ class Task extends Model
     public function priority(){
         return $this->hasOne(Priority::class);
     }
+
+    public function status(){
+        return $this->hasOne(Status::class);
+    }
 }

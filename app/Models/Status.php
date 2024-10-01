@@ -12,4 +12,8 @@ class Status extends Model
     protected $fillable = [
         'name', 'color', 'progress'
     ];
+
+    public function tasks(){
+        return $this->belongsToMany(Task::class);
+    }
 }
