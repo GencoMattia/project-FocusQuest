@@ -18,5 +18,9 @@ class ApiUserController extends Controller
             'email' => $validatedData['email'],
             'password' => bcrypt($validatedData['password']),
         ]);
+
+        return response()->json([
+            'message' => 'User created successfully',
+        ], 201);
     }
 }
