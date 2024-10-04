@@ -12,9 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('moments', function (Blueprint $table) {
-            $table->foreignId('moments_type_id')->nullable()
+            $table->foreignId('emotion_id')->nullable()
+                ->after('moments_type_id')
                 ->constrained()
-                ->after('id');
+                ->cascadeOnUpdate()
+                ->nullOnDelete();
         });
     }
 
@@ -24,8 +26,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('moments', function (Blueprint $table) {
-            $table->dropForeign(['moments_type_id']);
-            $table->dropColumn('moments_type_id');
+            $table->dropForeign(['emotion_id']);
+            $table->dropColumn('emotion_id');
         });
     }
 };
