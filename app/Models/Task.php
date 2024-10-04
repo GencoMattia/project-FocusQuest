@@ -36,6 +36,6 @@ class Task extends Model
     }
 
     public function moments(){
-        return $this->belongsToMany(Moment::class, 'moment_task');
+        return $this->hasMany(Moment::class);
     }
 }
