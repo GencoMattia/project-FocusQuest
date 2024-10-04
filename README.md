@@ -27,7 +27,7 @@ By doing this, the app aims to create a virtuous cycle, where the user's emotion
 
 The database is structured with two main entities: **Task** and **Moment**. 
 
-![Database Structure](public\assets\img\Project-FocusQuest.drawio.png)
+![Database Structure](public/assets/img/Project-FocusQuest.drawio.png)
 
 ### Task Entity  
 Tasks have a one-to-many relationship with the following entities: 
