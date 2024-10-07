@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\ApiUserController;
+use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -26,8 +27,8 @@ Route::group([
     'middleware' => 'api',
     'prefix' => 'auth'
 ], function ($router) {
-    Route::post('login', [AuthController::class, 'login']);  // Specifica il controller con la nuova sintassi
-    Route::post('logout', [AuthController::class, 'logout']);
-    Route::post('refresh', [AuthController::class, 'refresh']);
-    Route::post('me', [AuthController::class, 'me']);
+    Route::post('login', [ApiAuthController::class, 'login']);  // Specifica il controller con la nuova sintassi
+    Route::post('logout', [ApiAuthController::class, 'logout']);
+    Route::post('refresh', [ApiAuthController::class, 'refresh']);
+    Route::post('me', [ApiAuthController::class, 'me']);
 });
