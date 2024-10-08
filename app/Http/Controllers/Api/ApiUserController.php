@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -41,9 +42,33 @@ class ApiUserController extends Controller
         ]);
     }
 
-    public function update() {
+    public function update(UpdateUserRequest $request) {
         $user = auth()->user();
 
+        $validatedData = $request->validated();
 
+        if ($request->filled("password")) {
+            $validatedData["password"] = bcrypt($validatedData["password"]);
+        } else {
+            unset($validatedData["password"]);
+        }
+
+        $user->update($validatedData);
+
+        return response()->json([
+            "message" => "User profile updated successfully",
+            "user" => $user,
+        ], 200);
     }
+
+    public function destroy() {
+        $user = auth()->user();
+
+        $user->delete();
+
+        return response()->json([
+            "message" => "User account deleted successfully"
+        ], 200);
+    }
+
 }
