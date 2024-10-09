@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ApiTaskController;
 use App\Http\Controllers\Api\ApiUserController;
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Controllers\AuthController;
@@ -27,6 +28,7 @@ Route::group([
     'middleware' => 'api',
     'prefix' => 'auth'
 ], function ($router) {
+
     Route::post('login', [ApiAuthController::class, 'login'])->name('auth.login');
     Route::post('logout', [ApiAuthController::class, 'logout'])->name('auth.logout');
     Route::post('refresh', [ApiAuthController::class, 'refresh'])->name('auth.refresh');
@@ -37,4 +39,8 @@ Route::group(["middleware" => "auth:api"], function() {
     Route::get("user", [ApiUserController::class, "show"])->name("user.show");
     Route::put("user", [ApiUserController::class, "update"])->name("user.update");
     Route::delete("user", [ApiUserController::class, "destroy"])->name("user.destroy");
+
 });
+
+Route::get('get-form-data', [ApiTaskController::class, 'getFormData'])->name('get-form-data');
+Route::post('create-new-task', [ApiTaskController::class, 'create'])->name('create.new.task');
