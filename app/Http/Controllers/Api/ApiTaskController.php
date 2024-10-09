@@ -8,11 +8,13 @@ use App\Models\Category;
 use App\Models\Priority;
 use App\Models\Status;
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ApiTaskController extends Controller
 {
-    public function store(CreateNewTaskRequest $request) {
+    public function store(CreateNewTaskRequest $request)
+    {
         $data = $request->validated();
         $newTask = Task::create([
             'name' => $data['name'],
@@ -25,6 +27,17 @@ class ApiTaskController extends Controller
         ]);
 
         return response()->json(['message' => 'Task created successfully', 'task' => $newTask]);
+    }
+
+    public function getUserTask()
+    {
+        $authenticated_user_id = auth()->user->id;
+        $tasks = Task::where('user_id', $authenticated_user_id)->get();
+        // dump($tasks);
+        if ($tasks->isEmpty()) {
+            return response()->json(['message' => 'No tasks found for this user.'], 404);
+        }
+        return response()->json($tasks);
     }
 
 

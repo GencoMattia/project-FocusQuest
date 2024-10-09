@@ -43,4 +43,5 @@ Route::group(["middleware" => "auth:api"], function() {
     Route::get('get-form-data', [ApiTaskController::class, 'getFormData'])->name('get-form-data');
     Route::post('create-new-task', [ApiTaskController::class, 'store'])->name('create.new.task');
 
+    Route::get('tasks', [ApiTaskController::class, 'getUserTask'])->name('user.task.list');
 });
