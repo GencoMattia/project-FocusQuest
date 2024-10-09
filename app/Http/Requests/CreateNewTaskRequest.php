@@ -25,10 +25,10 @@ class CreateNewTaskRequest extends FormRequest
             "name"=>'required|string|min:3|max:150',
             "description"=>'string',
             'estimated_time' => 'required|integer|min:1',
-            "user_id"=> 'integer',
+            // // "user_id"=> 'integer',
             "category_id"=> 'integer',
             "priority_id"=> 'integer',
-            "status_id"=> 'integer'
+            // // "status_id"=> 'integer'
         ];
     }
 }

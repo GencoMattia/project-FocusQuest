@@ -12,31 +12,24 @@ use Illuminate\Http\Request;
 
 class ApiTaskController extends Controller
 {
-    public function store(Request $request){
-        dd($request);
+    public function store(CreateNewTaskRequest $request) {
         $data = $request->validated();
+        $newTask = Task::create([
+            'name' => $data['name'],
+            'description' => $data['description'] ?? null,
+            'estimated_time' => $data['estimated_time'],
+            'user_id' => auth()->id(),
+            'category_id' => $data['category_id'],
+            'priority_id' => $data['priority_id'],
+            'status_id' => 1,
+        ]);
 
-        $user = auth()->user();
-        $newTask = new Task();
-
-        $newTask["name"] = $data["name"];
-        $newTask["description"] = $data["description"] ?? null;
-        // $newTask["deadline"] = $data["deadline"];
-        $newTask["estimated_time"] = $data["estimated_time"];
-        // $newTask["effective_time"] = $data["effective_time"];
-
-        $newTask["user_id"] = $user->id;
-        $newTask["category_id"] = $data["category_id"];
-        $newTask["priority_id"] = $data["priority_id"];
-        $newTask["status_id"] = 1;
-
-        dd($newTask); // Questo interromperà l'esecuzione e mostrerà il dump di $newTask
-        $newTask->save();
-
-        return redirect('http://localhost:5173')->with('message', 'Task created successfully');
+        return response()->json(['message' => 'Task created successfully', 'task' => $newTask]);
     }
 
-    public function getFormData(){
+
+    public function getFormData()
+    {
         $priorities = Priority::all();
         $categories = Category::all();
         $statuses = Status::all();
@@ -44,9 +37,9 @@ class ApiTaskController extends Controller
         return response()->json([
             "message" => "success",
             "data" => [
-            "priorities" => $priorities,
-            "categories" => $categories,
-            "statuses" => $statuses
+                "priorities" => $priorities,
+                "categories" => $categories,
+                "statuses" => $statuses
             ]
         ]);
     }
