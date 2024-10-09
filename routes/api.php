@@ -40,7 +40,7 @@ Route::group(["middleware" => "auth:api"], function() {
     Route::put("user", [ApiUserController::class, "update"])->name("user.update");
     Route::delete("user", [ApiUserController::class, "destroy"])->name("user.destroy");
 
-});
+    Route::get('get-form-data', [ApiTaskController::class, 'getFormData'])->name('get-form-data');
+    Route::post('create-new-task', [ApiTaskController::class, 'store'])->name('create.new.task');
 
-Route::get('get-form-data', [ApiTaskController::class, 'getFormData'])->name('get-form-data');
-Route::post('create-new-task', [ApiTaskController::class, 'create'])->name('create.new.task');
+});

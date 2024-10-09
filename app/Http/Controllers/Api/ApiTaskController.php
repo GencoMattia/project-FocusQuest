@@ -12,10 +12,9 @@ use Illuminate\Http\Request;
 
 class ApiTaskController extends Controller
 {
-    public function create(CreateNewTaskRequest $request){
-        $data = $request->validated();
-
+    public function store(Request $request){
         dd($request);
+        $data = $request->validated();
 
         $user = auth()->user();
         $newTask = new Task();
