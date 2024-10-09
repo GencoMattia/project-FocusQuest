@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ApiTaskController;
 use App\Http\Controllers\Api\ApiUserController;
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Controllers\AuthController;
@@ -31,4 +32,10 @@ Route::group([
     Route::post('logout', [ApiAuthController::class, 'logout']);
     Route::post('refresh', [ApiAuthController::class, 'refresh']);
     Route::post('me', [ApiAuthController::class, 'me']);
+
+    //! ROUTE PER INSERIRE UNA NUOVA TASK
+    //ottenere i dati per il form
 });
+
+Route::get('get-form-data', [ApiTaskController::class, 'getFormData'])->name('get-form-data');
+Route::post('create-new-task', [ApiTaskController::class, 'create'])->name('create.new.task');

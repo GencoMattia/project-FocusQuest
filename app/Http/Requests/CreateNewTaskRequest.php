@@ -24,9 +24,9 @@ class CreateNewTaskRequest extends FormRequest
         return [
             "name"=>'required|string|min:3|max:150',
             "description"=>'string',
-            "deadline" => 'required|date',
-            'estimated_time' => 'required|date_format:H:i:s',
-            'effective_time' => 'required|date_format:H:i:s',
+            // "deadline" => 'required|date',
+            'estimated_time' => 'required|integer|min:1',
+            // 'effective_time' => 'required|date_format:H:i:s',
             "user_id"=> 'integer',
             "category_id"=> 'integer',
             "priority_id"=> 'integer',
