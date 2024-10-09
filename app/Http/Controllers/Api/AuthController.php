@@ -19,11 +19,6 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login', 'refresh']]);
     }
 
-    /**
-     * Get a JWT via given credentials.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -32,11 +27,15 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
+        $user = auth()->user();
+
         return response()->json([
-            'token'=>$this->respondWithToken($token),
-            'user'=>auth()->user()
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'user' => $user,
         ]);
     }
+
 
     /**
      * Get the authenticated User.

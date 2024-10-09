@@ -31,15 +31,15 @@ class ApiTaskController extends Controller
 
     public function getUserTask()
     {
-        $authenticated_user_id = auth()->user->id;
+        $authenticated_user_id = auth()->user()->id;
         $tasks = Task::where('user_id', $authenticated_user_id)->get();
-        // dump($tasks);
+
         if ($tasks->isEmpty()) {
             return response()->json(['message' => 'No tasks found for this user.'], 404);
         }
+
         return response()->json($tasks);
     }
-
 
     public function getFormData()
     {
