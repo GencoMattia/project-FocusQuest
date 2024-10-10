@@ -32,7 +32,11 @@ class ApiTaskController extends Controller
     public function getUserTask()
     {
         $authenticated_user_id = auth()->user()->id;
-        $tasks = Task::where('user_id', $authenticated_user_id)->get();
+        $tasks = Task::with('priority')
+        ->with('status')
+        ->with('category')
+        ->where('user_id', $authenticated_user_id)
+        ->get();
 
         if ($tasks->isEmpty()) {
             return response()->json(['message' => 'No tasks found for this user.'], 404);
@@ -55,5 +59,9 @@ class ApiTaskController extends Controller
                 "statuses" => $statuses
             ]
         ]);
+    }
+
+    public function modifyTaskStatus(){
+
     }
 }
