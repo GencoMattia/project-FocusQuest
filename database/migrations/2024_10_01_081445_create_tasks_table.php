@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name', 150);
             $table->text('description')->nullable();
-            $table->dateTime('deadline');
-            $table->time('estimated_time');
-            $table->time('effective_time')->nullable();
+            $table->dateTime('deadline')->nullable();
+            $table->unsignedSmallInteger('estimated_time');
+            $table->unsignedSmallInteger('effective_time')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
