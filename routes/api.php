@@ -44,4 +44,5 @@ Route::group(["middleware" => "auth:api"], function() {
     Route::post('create-new-task', [ApiTaskController::class, 'store'])->name('create.new.task');
 
     Route::get('tasks', [ApiTaskController::class, 'getUserTask'])->name('user.task.list');
+    Route::get('tasks/top-priority', [ApiTaskController::class, 'getTopPriorityTask'])->name('user.priority.task');
 });
