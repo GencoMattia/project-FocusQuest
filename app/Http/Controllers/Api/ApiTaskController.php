@@ -52,7 +52,7 @@ class ApiTaskController extends Controller
             ->first();
 
             if ($task) {
-                return response()->json(["message" => "To priority task retrieved successfully", "task" => $task]);
+                return response()->json(["message" => "Top priority task retrieved successfully", "task" => $task]);
             }
 
             return response()->json(["message" => "No Tasks found"], 404);
