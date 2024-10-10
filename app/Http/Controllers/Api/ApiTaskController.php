@@ -13,6 +13,26 @@ use Illuminate\Http\Request;
 
 class ApiTaskController extends Controller
 {
+    public function show($id){
+
+        $user_id = auth()->user()->id;
+        $task = Task::where('user_id', '=',  $user_id)
+        ->where("id", $id)
+        ->with(['priority', 'status', 'category'])
+        ->first();
+
+        if($task){
+            return response()->json([
+                'message' => 'success',
+                'task' => $task
+            ]);
+        }else {
+            return response()->json([
+                'message' => 'Task non trovata',
+            ], 404);
+        }
+    }
+
     public function store(CreateNewTaskRequest $request)
     {
         $data = $request->validated();
@@ -61,7 +81,15 @@ class ApiTaskController extends Controller
         ]);
     }
 
-    public function modifyTaskStatus(){
+    public function modifyTaskStatus(Request $request){
+        $data = $request->validate([
+            'status_id'=> 'required|integer|exists:statuses,id',
+            'task_id'=>'required|integer|exists:tasks,id'
+        ]);
 
+        $task = Task::findOrFail($request->task_id);
+
+        $task->status_id = $data['status_id'];
+        $task->save();
     }
 }

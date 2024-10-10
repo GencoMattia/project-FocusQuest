@@ -44,6 +44,7 @@ Route::group(["middleware" => "auth:api"], function() {
     Route::post('create-new-task', [ApiTaskController::class, 'store'])->name('create.new.task');
 
     //modifico lo status della task
+    Route::get('tasks/{id}', [ApiTaskController::class, 'show'])->name('show.task');
     Route::patch('tasks/{id}', [ApiTaskController::class, 'modifyTaskStatus'])->name('modify.task.status');
 
     Route::get('tasks', [ApiTaskController::class, 'getUserTask'])->name('user.task.list');
