@@ -41,7 +41,8 @@ class ApiTaskController extends Controller
         return response()->json($tasks);
     }
 
-    public function getTopPriorityTask(Request $request) {
+    public function getTopPriorityTask(Request $request)
+    {
         $estimatedTimeOrder = $request->input("estimated_time_order", "asc");
 
         $task = Task::where("user_id", auth()->id())
@@ -51,11 +52,11 @@ class ApiTaskController extends Controller
             ->orderBy("estimated_time", $estimatedTimeOrder)
             ->first();
 
-            if ($task) {
-                return response()->json(["message" => "Top priority task retrieved successfully", "task" => $task]);
-            }
+        if ($task) {
+            return response()->json(["message" => "Top priority task retrieved successfully", "task" => $task]);
+        }
 
-            return response()->json(["message" => "No Tasks found"], 404);
+        return response()->json(["message" => "No Tasks found"], 404);
     }
 
     public function getFormData()
@@ -74,13 +75,14 @@ class ApiTaskController extends Controller
         ]);
     }
 
-    public function searchTasks(Request $request) {
+    public function suggestTasks(Request $request)
+    {
         $query = $request->input("query");
-        $task = Task::where("user_id", auth()->id())
-            ->where("name", "like", "%{$query}%")
-            ->limit(5)
-            ->get();
+        $tasks = Task::where('name', 'like', '%' . $query . '%')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->unique('name');
 
-        return response()->json(["task" => $task]);
+        return response()->json(['tasks' => $tasks]);
     }
 }
