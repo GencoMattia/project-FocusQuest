@@ -73,4 +73,14 @@ class ApiTaskController extends Controller
             ]
         ]);
     }
+
+    public function searchTasks(Request $request) {
+        $query = $request->input("query");
+        $task = Task::where("user_id", auth()->id())
+            ->where("name", "like", "%{$query}%")
+            ->limit(5)
+            ->get();
+
+        return response()->json(["task" => $task]);
+    }
 }
