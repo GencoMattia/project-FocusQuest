@@ -20,6 +20,8 @@ return new class extends Migration
             $table->unsignedSmallInteger('effective_time')->nullable();
             $table->dateTime('started_at')->nullable();
             $table->dateTime('ended_at')->nullable();
+            $table->dateTime('paused_at')->nullable();
+            $table->dateTime('unpaused_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
