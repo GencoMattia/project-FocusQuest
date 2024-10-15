@@ -18,6 +18,7 @@ return new class extends Migration
             $table->dateTime('deadline')->nullable();
             $table->unsignedSmallInteger('estimated_time');
             $table->unsignedSmallInteger('effective_time')->nullable();
+            $table->time('started_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

@@ -40,4 +40,8 @@ class Task extends Model
     public function moments(){
         return $this->hasMany(Moment::class);
     }
+
+    public function time_intervals(){
+        return $this->hasMany(Time_Interval::class);
+    }
 }

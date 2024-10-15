@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ApiUserController;
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -48,4 +49,9 @@ Route::group(["middleware" => "auth:api"], function() {
     Route::patch('tasks/{id}', [ApiTaskController::class, 'modifyTaskStatus'])->name('modify.task.status');
 
     Route::get('tasks', [ApiTaskController::class, 'getUserTask'])->name('user.task.list');
+
+});
+
+Route::get('/test', function () {
+    return Carbon::now()->toDateTimeString();
 });
