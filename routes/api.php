@@ -45,4 +45,5 @@ Route::group(["middleware" => "auth:api"], function() {
 
     Route::get('tasks', [ApiTaskController::class, 'getUserTask'])->name('user.task.list');
     Route::get('tasks/top-priority', [ApiTaskController::class, 'getTopPriorityTask'])->name('user.priority.task');
+    Route::get('tasks/suggest-tasks', [ApiTaskController::class, 'suggestTasks'])->name('user.suggest.tasks');
 });
