@@ -26,5 +26,11 @@ class StatusSeeder extends Seeder
             'color' => '#00FF00',
             'progress' => 100,
         ]);
+
+        Status::create([
+            'name' => 'Paused',
+            'color' => '#65FF00',
+            'progress' => 45,
+        ]);
     }
 }
