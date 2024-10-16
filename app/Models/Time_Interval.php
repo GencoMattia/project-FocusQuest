@@ -12,7 +12,7 @@ class Time_Interval extends Model
     protected $table = 'time_intervals';
 
     protected $fillable = [
-        'time', 'task_id'
+        'time', 'task_id', 'type'
     ];
 
     public function task(){

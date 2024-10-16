@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table-> foreignId('task_id');
             $table-> unsignedMediumInteger('time');
+            $table->boolean('type');
             $table->timestamps();
         });
     }
