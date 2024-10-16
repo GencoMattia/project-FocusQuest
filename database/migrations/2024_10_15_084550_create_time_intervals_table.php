@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('moments', function (Blueprint $table) {
+        Schema::create('time_intervals', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100);
-            $table->text('message')->nullable();
-            $table->string('moment_img')->nullable();
+            $table-> foreignId('task_id');
+            $table-> unsignedMediumInteger('time');
+            $table->boolean('type');
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('moments');
+        Schema::dropIfExists('time_intervals');
     }
 };
