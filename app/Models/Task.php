@@ -44,4 +44,8 @@ class Task extends Model
     public function time_intervals(){
         return $this->hasMany(Time_Interval::class);
     }
+
+    public function pauses(){
+        return $this->hasMany(Pause::class);
+    }
 }
