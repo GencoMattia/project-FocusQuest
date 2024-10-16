@@ -15,8 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('name', 100);
             $table->text('message')->nullable();
-            $table->dateTime('started_at')->nullable();
-            $table->dateTime('ended_at')->nullable();
             $table->string('moment_img')->nullable();
             $table->timestamps();
         });
