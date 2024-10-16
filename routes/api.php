@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ApiMomentController;
 use App\Http\Controllers\Api\ApiTaskController;
 use App\Http\Controllers\Api\ApiUserController;
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
@@ -50,10 +51,12 @@ Route::group(["middleware" => "auth:api"], function() {
 
     Route::get('tasks', [ApiTaskController::class, 'getUserTask'])->name('user.task.list');
 
+    //aggiungo un nuovo Momento
+    Route::get('tasks/{id}/create-new-moment', [ApiMomentController::class, 'store'])->name('create.new.moment');
+
 
 });
-
 
     Route::get('tasks/top-priority', [ApiTaskController::class, 'getTopPriorityTask'])->name('user.priority.task');
     Route::get('tasks/suggest-tasks', [ApiTaskController::class, 'suggestTasks'])->name('user.suggest.tasks');
-});
+
