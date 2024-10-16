@@ -9,6 +9,7 @@ use App\Models\Priority;
 use App\Models\Status;
 use App\Models\Task;
 use App\Models\Time_Interval;
+use App\Models\Pause;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -98,102 +99,173 @@ class ApiTaskController extends Controller
 
         //! AVVIO
         if ($status == 2) {
-            $task->started_at = now();
-            $task->status_id = $status;
-            $task->save();
 
-            return response()->json([
-                'message' => 'Task avviata',
-                'task' => $task,
-                'now' => now('Europe/Rome')
-            ]);
+            //? se esistono pause
+            if ($task->pauses()->exists()) {
+
+                // Inizializza l'array vuoto
+                $total_pauses_array = [];
+
+                // Recupera tutte le pause concluse
+                $pauses = Pause::where('task_id', $task->id)
+                    ->whereNotNull('ended_at')
+                    ->get();
+
+                // Se ci sono pause concluse, assegna l'array
+                if ($pauses->count() > 0) {
+                    $total_pauses_array = $pauses;
+                }
+
+                //**Ritrovo l'ultima pausa associata alla task (quindi ancora aperta) */
+                $last_pause = Pause::where('task_id', $task->id)
+                    ->whereNull('ended_at')
+                    ->first();
+
+                //**Completo il campo ended_at dell-ultima pausa */
+                $last_pause->ended_at = now();
+                $last_pause->save();
+
+                //**Calcolo la durata in minuti della pausa appena conclusa */
+                $last_pause_created_at = $last_pause->created_at;
+                $pause_interval = Carbon::parse($last_pause->ended_at)->diffInMinutes($last_pause_created_at);
+
+                //**Aggiorno lo status della task **IN PROGRESS** */
+                $task->status_id = $status;
+                $task->save();
+
+                return response()->json([
+                    'message' => 'Task riavviata',
+                    'task' => $task,
+                    'last_pause' => $last_pause,
+                    'last_pause_duration_minutes' => $pause_interval,
+                    'total_pauses_array' => $total_pauses_array
+                ]);
+            }
+
+            //? se NON esistono pause
+            else {
+
+                //**Compilo il campo started_at della Task, rendendola attiva */
+                $task->started_at = now();
+                $task->status_id = $status;
+                $task->save();
+
+                return response()->json([
+                    'message' => 'Task avviata',
+                    'task' => $task,
+                ]);
+            }
         }
 
-        $started_at = $task->started_at ?? null;
 
         //! PAUSA
         if ($status == 4) {
-            $paused_at = now();
+
+            //**Aggiorno lo stato della task **IN PAUSA** */
             $task->status_id = $status;
             $task->save();
 
-
-            $time_interval = Carbon::parse($paused_at)->diffInMinutes($task->started_at);
-            $parsed_minutes = intval($time_interval);
-
-            $time_interval_data = [
+            //**Creo un'istanza del modello Pause */
+            $pause_data = [
                 'task_id' => $task->id,
-                'time' => $parsed_minutes
             ];
-
-            $new_time_interval = Time_Interval::create($time_interval_data);
+            $new_pause = Pause::create($pause_data);
 
             return response()->json([
                 'message' => 'Task in pausa!',
                 'task' => $task,
-                'time_interval_data' => $new_time_interval
+                'pause' => $new_pause
             ]);
         }
 
         //! COMPLETATA
         if ($status == 3) {
-            $completed_at = now();
+            //**Aggiorno lo stato della task e l'id dello stato **COMPLETATA** */
+            $task->ended_at = now();
             $task->status_id = $status;
             $task->save();
+
+
+            //*Dichiaro la variabile effective_time */
             $effective_time = 0;
 
             if ($task->started_at) {
 
-                if (!$task->time_intervals()->exists()) {
-                    $time_difference = Carbon::parse($completed_at)->diffInMinutes($task->started_at);
-                    $effective_time = intval($time_difference);
-                    $time_interval_data = [
-                        'task_id' => $task->id,
-                        'time' => $effective_time
-                    ];
+                //**! SE ESISTONO PAUSE */
+                if ($task->pauses()->exists()) {
 
-                    $new_time_interval = Time_Interval::create($time_interval_data);
+                    $total_pauses = [];
+                    // Recupero tutte le pause concluse (quelle con ended_at compilato)
+                    $pauses = Pause::where('task_id', $task->id)
+                        ->whereNotNull('ended_at')
+                        ->get();
 
+                    foreach ($pauses as $pause) {
+                        // Calcola la durata della pausa in minuti
+                        $pause_duration = Carbon::parse($pause->ended_at)->diffInMinutes($pause->created_at);
+                        // Aggiungi la durata all'array
+                        array_push($total_pauses, intval($pause_duration));
+                    }
+
+                    // Ora puoi calcolare la somma totale delle durate delle pause
+                    $total_pause_time = array_sum($total_pauses);
+                    // $total_pause_count = count($total_pauses);
+                    $total_time_with_pauses = Carbon::parse($task->ended_at)->diffInMinutes($task->started_at);
+
+                    // Calcolo del tempo effettivo
+                    $effective_time = intval($total_time_with_pauses) - $total_pause_time;
+
+                    if ($task->estimated_time > $effective_time) {
+                        $earned_time = $task->estimated_time - $effective_time;
+                        $effective_time_message = 'Ci hai messo di meno di quanto pensavi! ' . 'Hai guadagnato ' . $earned_time . ' minuti';
+                    } else {
+                        $earned_time = $effective_time - $task->estimated_time;
+                        $effective_time_message = 'Ci hai messo di più di quanto pensavi! ' . 'Ci hai messo ' . $earned_time . ' minuti in più';
+                    }
+
+                    $task->status_id = $status;
+                    $task->effective_time = $effective_time;
+                    $task->save();
+
+
+                    return response()->json([
+                        'message' => 'Task completata con pause',
+                        // 'number_of_pauses' => $total_pause_count,
+                        'total_task_time' => $this->formatTime($total_time_with_pauses),
+                        'effective_task_time' => $this->formatTime($effective_time),
+                        'total_pause_time' => $this->formatTime($total_pause_time),
+                        'effective_time_message' => $effective_time_message,
+                        'total_pauses' => $total_pauses,
+                        'task' => $task
+                    ]);
+                }
+                //**! SE NON ESISTONO PAUSE */
+                else {
+                    //**Calcolo la durata in minuti della task e la parso come un intero */
+                    $unparsed_effective_time = Carbon::parse($task->started_at)->diffInMinutes(Carbon::parse($task->ended_at));
+                    $effective_time = intval($unparsed_effective_time);
+
+                    //**Diversi messaggi in base alla differenza fra tempo stimato e tempo effettivo */
+                    if ($task->estimated_time > $effective_time) {
+                        $earned_time = $task->estimated_time - $effective_time;
+                        $effective_time_message = 'Ci hai messo di meno di quanto pensavi! ' . 'Hai guadagnato ' . $earned_time . ' minuti';
+                    } else {
+                        $earned_time = $effective_time - $task->estimated_time;
+                        $effective_time_message = 'Ci hai messo di più di quanto pensavi! ' . 'Ci hai messo ' . $earned_time . ' minuti in più';
+                    }
+
+                    //**Aggiorno lo stato della task */
+                    $task->status_id = $status;
                     $task->effective_time = $effective_time;
                     $task->save();
 
                     return response()->json([
-                        'message' => 'success',
-                        'task' => $task,
-                        'completed_at' => $completed_at,
-                        'effective_time' => $effective_time,
-                        'if' => 'sono entrato nell-if'
-                        // 'effective_time_message' => $effective_time_message,
-                        // 'earned_time' => $earned_time,
-                        // 'time_intervals' => $time_intervals
+                        'message' => 'Task completata senza pause',
+                        'effective_task_time' => $effective_time,
+                        'effective_time_message' => $effective_time_message,
+                        'task' => $task
                     ]);
-
                 }
-                // else{
-
-                //     $time_intervals = Time_Interval::where('task_id', $task->id)->pluck('time');
-
-                //     $effective_time = array_sum($time_intervals);
-
-                //     if ($task->estimated_time > $effective_time) {
-                //         $earned_time = $task->estimated_time - $effective_time;
-                //         $effective_time_message = 'Ci hai messo di meno di quanto pensavi!' . $earned_time;
-                //     } else {
-                //         $earned_time = $effective_time - $task->estimated_time;
-                //         $effective_time_message = 'Ci hai messo di più di quanto pensavi!' . $earned_time;
-                //     }
-                // }
-
-                return response()->json([
-                    'message' => 'success',
-                    'task' => $task,
-                    'completed_at' => $completed_at,
-                    'effective_time' => $effective_time,
-                    'if' => 'non sono entrato nell-if'
-                    // 'effective_time_message' => $effective_time_message,
-                    // 'earned_time' => $earned_time,
-                    // 'time_intervals' => $time_intervals
-                ]);
             }
         }
 
@@ -204,5 +276,12 @@ class ApiTaskController extends Controller
             'message' => 'status updated successfully',
             'task' => $task
         ]);
+    }
+
+    //*! UTILITIES *//
+    private function formatTime($minutes) {
+        $hours = floor($minutes / 60);
+        $remainingMinutes = $minutes % 60;
+        return "{$hours} ore {$remainingMinutes} minuti";
     }
 }
