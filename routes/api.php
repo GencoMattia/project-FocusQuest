@@ -42,7 +42,7 @@ Route::group(["middleware" => "auth:api"], function() {
     Route::put("user", [ApiUserController::class, "update"])->name("user.update");
     Route::delete("user", [ApiUserController::class, "destroy"])->name("user.destroy");
 
-    Route::get('get-form-data', [ApiTaskController::class, 'getFormData'])->name('get-form-data');
+    Route::get('get-form-data', [ApiTaskController::class, 'getFormData'])->name('get-task-form-data');
     Route::post('create-new-task', [ApiTaskController::class, 'store'])->name('create.new.task');
 
     //modifico lo status della task
@@ -52,7 +52,8 @@ Route::group(["middleware" => "auth:api"], function() {
     Route::get('tasks', [ApiTaskController::class, 'getUserTask'])->name('user.task.list');
 
     //aggiungo un nuovo Momento
-    Route::get('tasks/{id}/create-new-moment', [ApiMomentController::class, 'store'])->name('create.new.moment');
+    Route::get('get-moment-form-data', [ApiMomentController::class, 'getFormData'])->name('get-moment-form-data');
+    Route::post('tasks/{id}/create-new-moment', [ApiMomentController::class, 'store'])->name('create.new.moment');
 
 
 });

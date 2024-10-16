@@ -302,6 +302,7 @@ class ApiTaskController extends Controller
         $hours = floor($minutes / 60);
         $remainingMinutes = $minutes % 60;
         return "{$hours} ore {$remainingMinutes} minuti";
+    }
 
     public function suggestTasks(Request $request)
     {
