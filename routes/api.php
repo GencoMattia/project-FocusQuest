@@ -42,32 +42,41 @@ Route::group([
     'middleware' => 'auth:api',
     'prefix' => 'users'
 ], function () {
+    // Read
     Route::get('/show', [ApiUserController::class, 'show'])->name('user.show');
+    // Update
     Route::put('/update', [ApiUserController::class, 'update'])->name('user.update');
+    // Delete
     Route::delete('/destroy', [ApiUserController::class, 'destroy'])->name('user.destroy');
 });
 
-// Task-related routes with 'tasks' prefix, protected by JWT authentication
+// Task-related routes, protected by JWT authentication
 Route::group([
     'middleware' => 'auth:api',
     'prefix' => 'tasks'
 ], function () {
-    Route::get('/index', [ApiTaskController::class, 'getUserTask'])->name('user.task.list');
+    // Create
     Route::post('/create', [ApiTaskController::class, 'store'])->name('create.new.task');
+
+    // Read
+    Route::get('/index', [ApiTaskController::class, 'getUserTask'])->name('user.task.list');
     Route::get('/form-data', [ApiTaskController::class, 'getFormData'])->name('get-task-form-data');
     Route::get('/top-priority', [ApiTaskController::class, 'getTopPriorityTask'])->name('user.priority.task');
     Route::get('/suggest-tasks', [ApiTaskController::class, 'suggestTasks'])->name('user.suggest.tasks');
-
-    // Task-specific actions (using {id} as task identifier)
     Route::get('/{id}/show', [ApiTaskController::class, 'show'])->name('show.task');
+
+    // Update
     Route::patch('/{id}/status', [ApiTaskController::class, 'modifyTaskStatus'])->name('modify.task.status');
 });
 
-// Moment-related routes with 'moments' prefix, protected by JWT authentication
+// Moment-related routes, protected by JWT authentication
 Route::group([
     'middleware' => 'auth:api',
     'prefix' => 'moments'
 ], function () {
-    Route::get('/form-data', [ApiMomentController::class, 'getFormData'])->name('get-moment-form-data');
+    // Create
     Route::post('/tasks/{id}/create', [ApiMomentController::class, 'store'])->name('create.new.moment');
+
+    // Read
+    Route::get('/form-data', [ApiMomentController::class, 'getFormData'])->name('get-moment-form-data');
 });
