@@ -11,7 +11,7 @@ class CreateNewMomentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,9 +24,9 @@ class CreateNewMomentRequest extends FormRequest
         return [
             "task_id"=>'required|integer|exists:tasks,id',
             "name"=>'required|string|min:3',
-            'description'=>'string',
+            'message'=>'string',
             'emotion_id'=>'required|integer|exists:emotions,id',
-            'moment_type_id'=>'required|integer|exists:moments_types,id'
+            'moments_type_id'=>'required|integer|exists:moments_types,id'
         ];
     }
 }

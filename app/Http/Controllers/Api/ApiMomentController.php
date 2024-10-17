@@ -33,7 +33,10 @@ class ApiMomentController extends Controller
 
     public function store(CreateNewMomentRequest $request){
         $data = $request->validated();
-
         Moment::create($data);
+
+        return response()->json([
+            'message'=> 'Momento creato con successo'
+        ]);
     }
 }
