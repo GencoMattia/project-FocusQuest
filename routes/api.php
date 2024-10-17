@@ -41,10 +41,11 @@ Route::group(["middleware" => "auth:api"], function () {
     Route::put("user", [ApiUserController::class, "update"])->name("user.update");
     Route::delete("user", [ApiUserController::class, "destroy"])->name("user.destroy");
 
-    Route::get('get-form-data', [ApiTaskController::class, 'getFormData'])->name('get-form-data');
+    Route::get('get-form-data', [ApiTaskController::class, 'getFormData'])->name('get-task-form-data');
     Route::post('create-new-task', [ApiTaskController::class, 'store'])->name('create.new.task');
 
     Route::get('tasks', [ApiTaskController::class, 'getUserTask'])->name('user.task.list');
+
     Route::get('tasks/top-priority', [ApiTaskController::class, 'getTopPriorityTask'])->name('user.priority.task');
     Route::get('tasks/suggest-tasks', [ApiTaskController::class, 'suggestTasks'])->name('user.suggest.tasks');
 
@@ -56,3 +57,4 @@ Route::group(["middleware" => "auth:api"], function () {
     Route::get('tasks/{id}', [ApiTaskController::class, 'show'])->name('show.task');
     Route::patch('tasks/{id}', [ApiTaskController::class, 'modifyTaskStatus'])->name('modify.task.status');
 });
+
