@@ -6,7 +6,6 @@ use App\Http\Controllers\Api\ApiUserController;
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,7 +36,7 @@ Route::group([
     Route::post('me', [ApiAuthController::class, 'me'])->name('auth.me');
 });
 
-Route::group(["middleware" => "auth:api"], function() {
+Route::group(["middleware" => "auth:api"], function () {
     Route::get("user", [ApiUserController::class, "show"])->name("user.show");
     Route::put("user", [ApiUserController::class, "update"])->name("user.update");
     Route::delete("user", [ApiUserController::class, "destroy"])->name("user.destroy");
@@ -45,19 +44,17 @@ Route::group(["middleware" => "auth:api"], function() {
     Route::get('get-form-data', [ApiTaskController::class, 'getFormData'])->name('get-task-form-data');
     Route::post('create-new-task', [ApiTaskController::class, 'store'])->name('create.new.task');
 
-    //modifico lo status della task
-    Route::get('tasks/{id}', [ApiTaskController::class, 'show'])->name('show.task');
-    Route::patch('tasks/{id}', [ApiTaskController::class, 'modifyTaskStatus'])->name('modify.task.status');
-
     Route::get('tasks', [ApiTaskController::class, 'getUserTask'])->name('user.task.list');
+
+    Route::get('tasks/top-priority', [ApiTaskController::class, 'getTopPriorityTask'])->name('user.priority.task');
+    Route::get('tasks/suggest-tasks', [ApiTaskController::class, 'suggestTasks'])->name('user.suggest.tasks');
 
     //aggiungo un nuovo Momento
     Route::get('get-moment-form-data', [ApiMomentController::class, 'getFormData'])->name('get-moment-form-data');
     Route::post('tasks/{id}/create-new-moment', [ApiMomentController::class, 'store'])->name('create.new.moment');
 
-
+    //modifico lo status della task
+    Route::get('tasks/{id}', [ApiTaskController::class, 'show'])->name('show.task');
+    Route::patch('tasks/{id}', [ApiTaskController::class, 'modifyTaskStatus'])->name('modify.task.status');
 });
-
-    Route::get('tasks/top-priority', [ApiTaskController::class, 'getTopPriorityTask'])->name('user.priority.task');
-    Route::get('tasks/suggest-tasks', [ApiTaskController::class, 'suggestTasks'])->name('user.suggest.tasks');
 
