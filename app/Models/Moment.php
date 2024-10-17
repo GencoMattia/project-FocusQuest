@@ -11,7 +11,7 @@ class Moment extends Model
     protected $fillable = [
         'moments_type_id',
         'emotion_id',
-        'name', 'message', 'moment_img',
+        'name', 'message', 'started_at', 'ended_at', 'moment_img',
         'task_id',
     ];
 

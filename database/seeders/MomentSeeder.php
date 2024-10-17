@@ -21,6 +21,8 @@ class MomentSeeder extends Seeder
         Moment::create([
             'name' => 'Morning Walk',
             'message' => 'Had a pleasant walk in the park.',
+            'started_at' => now()->subHours(2),
+            'ended_at' => now()->subHour(1),
             'emotion_id' => $emotionHappiness->id,
             'moments_type_id' => $momentType->id,
             'task_id' => $faker-> randomElement($task),
@@ -29,6 +31,8 @@ class MomentSeeder extends Seeder
         Moment::create([
             'name' => 'Missed Deadline',
             'message' => 'Failed to submit work on time.',
+            'started_at' => now()->subDays(1),
+            'ended_at' => now(),
             'emotion_id' => $emotionSadness->id,
             'moments_type_id' => $momentType->id,
             'task_id' => $faker-> randomElement($task),
