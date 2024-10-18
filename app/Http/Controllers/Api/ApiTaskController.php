@@ -23,7 +23,7 @@ class ApiTaskController extends Controller
         $user_id = auth()->user()->id;
         $task = Task::where('user_id', '=',  $user_id)
             ->where("id", $id)
-            ->with(['priority', 'status', 'category'])
+            ->with(['priority', 'status', 'category', 'moments'])
             ->first();
 
         if ($task) {
