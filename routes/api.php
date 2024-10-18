@@ -19,42 +19,64 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
-Route::post('sign-in', [ApiUserController::class, 'create'])->name('user.create');
+// Route for user registration (no authentication required)
+Route::post('register', [ApiUserController::class, 'store'])->name('user.register');
 
+// Authentication routes protected by the 'api' middleware (JWT-based authentication)
 Route::group([
     'middleware' => 'api',
     'prefix' => 'auth'
-], function ($router) {
-
+], function () {
     Route::post('login', [ApiAuthController::class, 'login'])->name('auth.login');
     Route::post('logout', [ApiAuthController::class, 'logout'])->name('auth.logout');
     Route::post('refresh', [ApiAuthController::class, 'refresh'])->name('auth.refresh');
     Route::post('me', [ApiAuthController::class, 'me'])->name('auth.me');
 });
 
-Route::group(["middleware" => "auth:api"], function () {
-    Route::get("user", [ApiUserController::class, "show"])->name("user.show");
-    Route::put("user", [ApiUserController::class, "update"])->name("user.update");
-    Route::delete("user", [ApiUserController::class, "destroy"])->name("user.destroy");
-
-    Route::get('get-form-data', [ApiTaskController::class, 'getFormData'])->name('get-task-form-data');
-    Route::post('create-new-task', [ApiTaskController::class, 'store'])->name('create.new.task');
-
-    Route::get('tasks', [ApiTaskController::class, 'getUserTask'])->name('user.task.list');
-
-    Route::get('tasks/top-priority', [ApiTaskController::class, 'getTopPriorityTask'])->name('user.priority.task');
-    Route::get('tasks/suggest-tasks', [ApiTaskController::class, 'suggestTasks'])->name('user.suggest.tasks');
-
-    //aggiungo un nuovo Momento
-    Route::get('get-moment-form-data', [ApiMomentController::class, 'getFormData'])->name('get-moment-form-data');
-    Route::post('tasks/{id}/create-new-moment', [ApiMomentController::class, 'store'])->name('create.new.moment');
-
-    //modifico lo status della task
-    Route::get('tasks/{id}', [ApiTaskController::class, 'show'])->name('show.task');
-    Route::patch('tasks/{id}', [ApiTaskController::class, 'modifyTaskStatus'])->name('modify.task.status');
+// User-related routes, protected by JWT authentication
+Route::group([
+    'middleware' => 'auth:api',
+    'prefix' => 'users'
+], function () {
+    // Read
+    Route::get('/show', [ApiUserController::class, 'show'])->name('user.show');
+    // Update
+    Route::put('/update', [ApiUserController::class, 'update'])->name('user.update');
+    // Delete
+    Route::delete('/destroy', [ApiUserController::class, 'destroy'])->name('user.destroy');
 });
 
+// Task-related routes, protected by JWT authentication
+Route::group([
+    'middleware' => 'auth:api',
+    'prefix' => 'tasks'
+], function () {
+    // Create
+    Route::post('/create', [ApiTaskController::class, 'store'])->name('create.new.task');
+
+    // Read
+    Route::get('/index', [ApiTaskController::class, 'getUserTask'])->name('user.task.list');
+    Route::get('/form-data', [ApiTaskController::class, 'getFormData'])->name('get-task-form-data');
+    Route::get('/top-priority', [ApiTaskController::class, 'getTopPriorityTask'])->name('user.priority.task');
+    Route::get('/suggest-tasks', [ApiTaskController::class, 'suggestTasks'])->name('user.suggest.tasks');
+    Route::get('/{id}/show', [ApiTaskController::class, 'show'])->name('show.task');
+
+    // Update
+    Route::patch('/{id}/status', [ApiTaskController::class, 'modifyTaskStatus'])->name('modify.task.status');
+});
+
+// Moment-related routes, protected by JWT authentication
+Route::group([
+    'middleware' => 'auth:api',
+    'prefix' => 'moments'
+], function () {
+    // Create
+    Route::post('/tasks/{id}/create', [ApiMomentController::class, 'store'])->name('create.new.moment');
+
+    // Read
+    Route::get('/form-data', [ApiMomentController::class, 'getFormData'])->name('get-moment-form-data');
+});
