@@ -79,4 +79,7 @@ Route::group([
 
     // Read
     Route::get('/form-data', [ApiMomentController::class, 'getFormData'])->name('get-moment-form-data');
+
+    //Get Moment Card Data
+    Route::get('/get-card-data', [ApiMomentController::class, 'getMomentData'])->name('get-moment-card-data');
 });
