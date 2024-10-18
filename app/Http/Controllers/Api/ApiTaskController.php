@@ -120,15 +120,11 @@ class ApiTaskController extends Controller
 
             //? se esistono pause
             if ($task->number_of_pauses>=1) {
-
-                // Inizializza l'array vuoto
                 $task->resumed_at = now();
                 $total_rest_time = $task->resumed_at->diffInMinutes($task->paused_at);
                 $task->rest_time += $total_rest_time;
-
                 $rest_time_message = 'Tutto funziona';
 
-                //**Aggiorno lo status della task **IN PROGRESS** */
                 $task->status_id = $status;
                 $task->save();
 
@@ -139,11 +135,7 @@ class ApiTaskController extends Controller
                     'message'=> $rest_time_message
                 ]);
             }
-
-            //? se NON esistono pause
             else {
-
-                //**Compilo il campo started_at della Task, rendendola attiva */
                 $task->started_at = now();
                 $task->status_id = $status;
                 $task->save();
@@ -158,15 +150,10 @@ class ApiTaskController extends Controller
 
         //! PAUSA
         if ($status == 4) {
-
-
             $task->paused_at = now();
-
-            //**Aggiorno lo stato della task **IN PAUSA** */
             $task->status_id = $status;
             $task->number_of_pauses++;
             $task->save();
-
 
             return response()->json([
                 'message' => 'Task in pausa!',
@@ -177,13 +164,9 @@ class ApiTaskController extends Controller
 
         //! COMPLETATA
         if ($status == 3) {
-            //**Aggiorno lo stato della task e l'id dello stato **COMPLETATA** */
             $task->ended_at = now();
             $task->status_id = $status;
             $task->save();
-
-
-            //*Dichiaro la variabile effective_time */
             $effective_time = 0;
 
             if ($task->started_at) {
@@ -191,13 +174,7 @@ class ApiTaskController extends Controller
                 //**! SE ESISTONO PAUSE */
                 if ($task->number_of_pauses>=1) {
 
-
-                    // Ora puoi calcolare la somma totale delle durate delle pause
-                    // $total_pause_count = count($total_pauses);
                     $total_time_with_pauses = Carbon::parse($task->ended_at)->diffInMinutes($task->started_at);
-
-                    // Calcolo del tempo effettivo
-                    // $effective_time = intval($total_time_with_pauses) - $total_pause_time;
 
                     if ($task->estimated_time > $effective_time) {
                         $earned_time = $task->estimated_time - $effective_time;
@@ -210,7 +187,6 @@ class ApiTaskController extends Controller
                     $task->status_id = $status;
                     $task->effective_time = $effective_time;
                     $task->save();
-
 
                     return response()->json([
                         'message' => 'Task completata con pause',
