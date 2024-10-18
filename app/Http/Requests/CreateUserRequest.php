@@ -25,7 +25,7 @@ class CreateUserRequest extends FormRequest
             "name"=>'required|min:3|max:50',
             "surname"=>'required|min:3|max:50',
             "email"=>'required|email|min:3',
-            "password"=>'required|min:8'
+            "password"=>'required|min:8|confirmed'
         ];
     }
 }
