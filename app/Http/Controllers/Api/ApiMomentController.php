@@ -12,6 +12,23 @@ use Illuminate\Http\Request;
 
 class ApiMomentController extends Controller
 {
+    public function getMomentData(Request $request){
+        $emotion_id = $request->emotion_id;
+        $moments_type_id = $request->moments_type_id;
+        $task_id= $request->task_id;
+
+        $moment_emotion = Emotion::findOrFail($emotion_id);
+        $moment_moments_type = MomentsType::findOrFail($moments_type_id);
+        $moment_task= Task::findOrFail($task_id);
+
+        return response()->json([
+            'message' => 'dati del componente Moment recuperati correttamente',
+            'moment_emotion' => $moment_emotion,
+            'moment_moments_type'=> $moment_moments_type,
+            'moment_task' =>$moment_task
+        ]);
+    }
+
     public function getFormData(Request $request){
         $task_id = $request->validate([
             'task_id'=> 'required|integer|exists:tasks,id'
