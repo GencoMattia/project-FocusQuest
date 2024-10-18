@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 // });
 
 // Route for user registration (no authentication required)
-Route::post('register', [ApiUserController::class, 'create'])->name('user.register');
+Route::post('register', [ApiUserController::class, 'store'])->name('user.register');
 
 // Authentication routes protected by the 'api' middleware (JWT-based authentication)
 Route::group([
