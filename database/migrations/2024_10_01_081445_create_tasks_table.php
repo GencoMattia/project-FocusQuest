@@ -22,6 +22,8 @@ return new class extends Migration
             $table->unsignedSmallInteger('rest_time')->nullable();
             $table->dateTime('started_at')->nullable();
             $table->dateTime('ended_at')->nullable();
+            $table->dateTime('paused_at')->nullable();
+            $table->dateTime('resumed_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

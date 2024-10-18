@@ -8,7 +8,6 @@ use App\Models\Category;
 use App\Models\Priority;
 use App\Models\Status;
 use App\Models\Task;
-use App\Models\Time_Interval;
 use App\Models\Pause;
 use App\Models\User;
 use Carbon\Carbon;
@@ -120,33 +119,14 @@ class ApiTaskController extends Controller
         if ($status == 2) {
 
             //? se esistono pause
-            if ($task->pauses()->exists()) {
+            if ($task->number_of_pauses>=1) {
 
                 // Inizializza l'array vuoto
-                $total_pauses_array = [];
+                $task->resumed_at = now();
+                $total_rest_time = $task->resumed_at->diffInMinutes($task->paused_at);
+                $task->rest_time += $total_rest_time;
 
-                // Recupera tutte le pause concluse
-                $pauses = Pause::where('task_id', $task->id)
-                    ->whereNotNull('ended_at')
-                    ->get();
-
-                // Se ci sono pause concluse, assegna l'array
-                if ($pauses->count() > 0) {
-                    $total_pauses_array = $pauses;
-                }
-
-                //**Ritrovo l'ultima pausa associata alla task (quindi ancora aperta) */
-                $last_pause = Pause::where('task_id', $task->id)
-                    ->whereNull('ended_at')
-                    ->first();
-
-                //**Completo il campo ended_at dell-ultima pausa */
-                $last_pause->ended_at = now();
-                $last_pause->save();
-
-                //**Calcolo la durata in minuti della pausa appena conclusa */
-                $last_pause_created_at = $last_pause->created_at;
-                $pause_interval = Carbon::parse($last_pause->ended_at)->diffInMinutes($last_pause_created_at);
+                $rest_time_message = 'Tutto funziona';
 
                 //**Aggiorno lo status della task **IN PROGRESS** */
                 $task->status_id = $status;
@@ -155,9 +135,8 @@ class ApiTaskController extends Controller
                 return response()->json([
                     'message' => 'Task riavviata',
                     'task' => $task,
-                    'last_pause' => $last_pause,
-                    'last_pause_duration_minutes' => $pause_interval,
-                    'total_pauses_array' => $total_pauses_array
+                    'task_rest_time'=> $task->rest_time,
+                    'message'=> $rest_time_message
                 ]);
             }
 
@@ -180,20 +159,19 @@ class ApiTaskController extends Controller
         //! PAUSA
         if ($status == 4) {
 
+
+            $task->paused_at = now();
+
             //**Aggiorno lo stato della task **IN PAUSA** */
             $task->status_id = $status;
+            $task->number_of_pauses++;
             $task->save();
 
-            //**Creo un'istanza del modello Pause */
-            $pause_data = [
-                'task_id' => $task->id,
-            ];
-            $new_pause = Pause::create($pause_data);
 
             return response()->json([
                 'message' => 'Task in pausa!',
                 'task' => $task,
-                'pause' => $new_pause
+                'number_of_pauses' => $task->number_of_pauses,
             ]);
         }
 
@@ -211,28 +189,15 @@ class ApiTaskController extends Controller
             if ($task->started_at) {
 
                 //**! SE ESISTONO PAUSE */
-                if ($task->pauses()->exists()) {
+                if ($task->number_of_pauses>=1) {
 
-                    $total_pauses = [];
-                    // Recupero tutte le pause concluse (quelle con ended_at compilato)
-                    $pauses = Pause::where('task_id', $task->id)
-                        ->whereNotNull('ended_at')
-                        ->get();
-
-                    foreach ($pauses as $pause) {
-                        // Calcola la durata della pausa in minuti
-                        $pause_duration = Carbon::parse($pause->ended_at)->diffInMinutes($pause->created_at);
-                        // Aggiungi la durata all'array
-                        array_push($total_pauses, intval($pause_duration));
-                    }
 
                     // Ora puoi calcolare la somma totale delle durate delle pause
-                    $total_pause_time = array_sum($total_pauses);
                     // $total_pause_count = count($total_pauses);
                     $total_time_with_pauses = Carbon::parse($task->ended_at)->diffInMinutes($task->started_at);
 
                     // Calcolo del tempo effettivo
-                    $effective_time = intval($total_time_with_pauses) - $total_pause_time;
+                    // $effective_time = intval($total_time_with_pauses) - $total_pause_time;
 
                     if ($task->estimated_time > $effective_time) {
                         $earned_time = $task->estimated_time - $effective_time;
@@ -249,12 +214,10 @@ class ApiTaskController extends Controller
 
                     return response()->json([
                         'message' => 'Task completata con pause',
-                        // 'number_of_pauses' => $total_pause_count,
                         'total_task_time' => $this->formatTime($total_time_with_pauses),
                         'effective_task_time' => $this->formatTime($effective_time),
-                        'total_pause_time' => $this->formatTime($total_pause_time),
+                        // 'total_pause_time' => $this->formatTime($total_pause_time),
                         'effective_time_message' => $effective_time_message,
-                        'total_pauses' => $total_pauses,
                         'task' => $task
                     ]);
                 }
