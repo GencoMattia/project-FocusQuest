@@ -51,24 +51,30 @@ class ApiUserController extends Controller
     }
 
     public function update(UpdateUserRequest $request) {
-        $user = auth()->user();
+        try {
+            $user = auth()->user();
 
-        $validatedData = $request->validated();
+            $validatedData = $request->validated();
 
-        if ($request->filled("password")) {
-            $validatedData["password"] = bcrypt($validatedData["password"]);
-        } else {
-            unset($validatedData["password"]);
+            if ($request->filled("password")) {
+                $validatedData["password"] = bcrypt($validatedData["password"]);
+            } else {
+                unset($validatedData["password"]);
+            }
+
+            $user->update($validatedData);
+
+            return response()->json([
+                "message" => "User profile updated successfully",
+                "user" => $user,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to update user profile',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $user->update($validatedData);
-
-        return response()->json([
-            "message" => "User profile updated successfully",
-            "user" => $user,
-        ], 200);
     }
-
     public function destroy() {
         $user = auth()->user();
 
