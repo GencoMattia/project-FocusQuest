@@ -42,7 +42,7 @@ class ApiTaskController extends Controller
     {
         $data = $request->validated();
 
-        $deadline = $data["deadline"] ?? now()->toDateString();
+        // $deadline = $data["deadline"] ?? now()->toDateString();
 
         $newTask = Task::create([
             'name' => $data['name'],
@@ -52,7 +52,7 @@ class ApiTaskController extends Controller
             'category_id' => $data['category_id'],
             'priority_id' => $data['priority_id'],
             'status_id' => 1,
-            'deadline' => $deadline,
+            'deadline' => $data["deadline"] ?? now()->toDateString(),
         ]);
 
         return response()->json(['message' => 'Task created successfully', 'task' => $newTask]);

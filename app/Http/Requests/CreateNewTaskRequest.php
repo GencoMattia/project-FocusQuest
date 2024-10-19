@@ -25,7 +25,7 @@ class CreateNewTaskRequest extends FormRequest
             "name" => 'required|string|min:3|max:150',
             "description" => 'nullable|string',
             "estimated_time" => 'required|integer|min:1',
-            "deadline" => 'required|date|after_or_equal:today',
+            "deadline" => 'date|after_or_equal:today',
             "category_id" => 'required|integer|exists:categories,id',
             "priority_id" => 'required|integer|exists:priorities,id',
         ];
