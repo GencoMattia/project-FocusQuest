@@ -19,18 +19,26 @@ class ApiUserController extends Controller
 
 
     public function store(CreateUserRequest $request) {
-        $validatedData = $request->validated();
+        try {
+            $validatedData = $request->validated();
 
-        $user = User::create([
-            'name' => $validatedData['name'],
-            'surname' => $validatedData['surname'],
-            'email' => $validatedData['email'],
-            'password' => bcrypt($validatedData['password']),
-        ]);
+            $user = User::create([
+                'name' => $validatedData['name'],
+                'surname' => $validatedData['surname'],
+                'email' => $validatedData['email'],
+                'password' => bcrypt($validatedData['password']),
+            ]);
 
-        return response()->json([
-            'message' => 'User created successfully',
-        ], 201);
+            return response()->json([
+                'message' => 'User created successfully',
+                'user' => $user
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to create user',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function show() {
