@@ -61,6 +61,7 @@ class ApiTaskController extends Controller
             ->with('status')
             ->with('category')
             ->where('user_id', $authenticated_user_id)
+            // ->where('status_id', $status_id)
             ->get();
 
         if ($tasks->isEmpty()) {
@@ -114,6 +115,9 @@ class ApiTaskController extends Controller
 
         $task = Task::findOrFail($data['task_id']);
         $status = $data['status_id'];
+
+        $task->status_id = $status;
+        $task->save();
 
         //! AVVIO
         if ($status == 2) {

@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -7,11 +8,13 @@ use App\Models\User;
 use App\Models\Category;
 use App\Models\Priority;
 use App\Models\Status;
+use Illuminate\Support\Carbon;
+use Faker\Generator as Faker;
 use Illuminate\Support\Str;
 
 class TaskSeeder extends Seeder
 {
-    public function run()
+    public function run(Faker $faker)
     {
         // Generiamo 20 task casuali
         for ($i = 0; $i < 20; $i++) {
@@ -20,7 +23,7 @@ class TaskSeeder extends Seeder
             $priority = Priority::inRandomOrder()->first();
             $status = Status::inRandomOrder()->first();
 
-            Task::create([
+            $newTask = Task::create([
                 'name' => $this->generateRandomTaskName(),
                 'description' => $this->generateRandomDescription(),
                 'deadline' => now()->addDays(rand(1, 30)), // Scadenza casuale tra 1 e 30 giorni
@@ -31,6 +34,39 @@ class TaskSeeder extends Seeder
                 'priority_id' => $priority->id,
                 'status_id' => $status->id,
             ]);
+
+
+            // Ottieni la data di oggi
+            $today = Carbon::today();
+
+            // Calcola l'inizio della settimana (lunedì) e la fine della settimana (domenica)
+            $startOfWeek = $today->startOfWeek(); // Lunedì
+            $endOfWeek = $today->endOfWeek(); // Domenica
+
+            // Genera una data casuale in questa settimana, incluso un orario casuale
+            $randomTimestampThisWeek = rand($startOfWeek->timestamp, $endOfWeek->timestamp);
+
+            // Aggiungi un orario casuale tra 00:00:00 e 23:59:59
+            $randomHour = rand(0, 23);
+            $randomMinute = rand(0, 59);
+            $randomSecond = rand(0, 59);
+
+            // Crea una data casuale con l'orario
+            $randomDateThisWeek = Carbon::createFromTimestamp($randomTimestampThisWeek)
+                ->setTime($randomHour, $randomMinute, $randomSecond);
+
+            switch ($newTask->status_id) {
+                case '3':
+                    $newTask->started_at = $randomDateThisWeek;
+                    $newTask->ended_at = (clone $newTask->started_at)->addMinutes(rand(15, 240)); // Assicurati di clonare per non modificare la data di inizio
+                    $newTask->save();
+                    break;
+                case '2':
+                case '4':
+                    $newTask->started_at = $faker->dateTimeThisMonth();
+                    $newTask->save();
+                    break;
+            }
         }
     }
 
@@ -92,5 +128,3 @@ class TaskSeeder extends Seeder
         return $descriptions[array_rand($descriptions)];
     }
 }
-
-
