@@ -41,6 +41,9 @@ class ApiTaskController extends Controller
     public function store(CreateNewTaskRequest $request)
     {
         $data = $request->validated();
+
+        $deadline = $data["deadline"] ?? now()->toDateString();
+
         $newTask = Task::create([
             'name' => $data['name'],
             'description' => $data['description'] ?? null,
@@ -49,6 +52,7 @@ class ApiTaskController extends Controller
             'category_id' => $data['category_id'],
             'priority_id' => $data['priority_id'],
             'status_id' => 1,
+            'deadline' => $deadline,
         ]);
 
         return response()->json(['message' => 'Task created successfully', 'task' => $newTask]);
