@@ -16,7 +16,9 @@ class Task extends Model
         'category_id',
         'priority_id',
         'status_id',
-        'name', 'description', 'deadline', 'estimated_time', 'effective_time'
+        'name', 'description',
+        // 'deadline',
+        'estimated_time', 'effective_time'
     ];
 
     public function user(){
@@ -36,6 +38,14 @@ class Task extends Model
     }
 
     public function moments(){
-        return $this->belongsToMany(Moment::class, 'moment_task');
+        return $this->hasMany(Moment::class);
+    }
+
+    public function time_intervals(){
+        return $this->hasMany(Time_Interval::class);
+    }
+
+    public function pauses(){
+        return $this->hasMany(Pause::class);
     }
 }

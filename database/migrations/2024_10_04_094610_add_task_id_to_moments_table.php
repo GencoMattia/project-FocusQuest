@@ -11,18 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('moment_task', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('moment_id')->nullable()->constrained()
+        Schema::table('moments', function (Blueprint $table) {
+            $table->foreignId("task_id")->nullable()
+                ->after("id")
+                ->constrained()
                 ->cascadeOnUpdate()
                 ->nullOnDelete();
-
-                $table->foreignId('task_id')->nullable()->constrained()
-
-                ->cascadeOnUpdate()
-                ->cascadeOnDelete();
-
-            $table->timestamps();
         });
     }
 
@@ -31,6 +25,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('moment_task');
+        Schema::table('moments', function (Blueprint $table) {
+            $table->dropForeign(["task_id"]);
+            $table->dropColumn("task_id");
+        });
     }
 };
