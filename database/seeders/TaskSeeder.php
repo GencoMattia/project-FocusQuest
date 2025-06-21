@@ -22,6 +22,9 @@ class TaskSeeder extends Seeder
             $category = Category::inRandomOrder()->first();
             $priority = Priority::inRandomOrder()->first();
             $status = Status::inRandomOrder()->first();
+            if (!$user || !$category || !$priority || !$status) {
+                continue;
+            }
 
             $newTask = Task::create([
                 'name' => $this->generateRandomTaskName(),

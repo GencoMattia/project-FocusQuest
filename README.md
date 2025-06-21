@@ -43,3 +43,12 @@ Moments have a one-to-many relationship with:
 - **MomentType**
 
 Moments are also linked to the **Task** entity to track the specific task associated with each moment. All foreign keys are based on the entity’s unique **ID**.
+
+## 🚀 Setup rapido
+
+1. Clona il repository
+2. Esegui `composer install` e `npm install`
+3. Copia `.env.example` in `.env` e configura il database
+4. Esegui `php artisan key:generate`
+5. Esegui le migrazioni e i seeder: `php artisan migrate --seed`
+6. Avvia il server: `php artisan serve`

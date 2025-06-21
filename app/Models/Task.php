@@ -16,29 +16,49 @@ class Task extends Model
         'category_id',
         'priority_id',
         'status_id',
-        'name', 'description',
-        // 'deadline',
-        'estimated_time', 'effective_time'
+        'name',
+        'description',
+        'deadline',
+        'estimated_time',
+        'effective_time'
     ];
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function category(){
+    public function category()
+    {
         return $this->belongsTo(Category::class);
     }
 
-    public function priority(){
+    public function priority()
+    {
         return $this->belongsTo(Priority::class);
     }
 
-    public function status(){
+    public function status()
+    {
         return $this->belongsTo(Status::class);
     }
 
-    public function moments(){
+    public function moments()
+    {
         return $this->hasMany(Moment::class);
     }
 
+    /**
+     * If the deadline isn't filled by the user, it will be set the value to the odiern date.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::creating(function ($task) {
+            if (empty($task->deadline)) {
+                $task->deadline = now()->toDateString();
+            }
+        });
+    }
 }

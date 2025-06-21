@@ -17,6 +17,9 @@ class MomentSeeder extends Seeder
         $momentType = MomentsType::first();
 
         $task = Task::all()->pluck("id");
+        if ($task->isEmpty()) {
+            return;
+        }
 
         Moment::create([
             'name' => 'Morning Walk',

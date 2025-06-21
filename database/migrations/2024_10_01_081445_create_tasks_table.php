@@ -26,6 +26,14 @@ return new class extends Migration
             $table->dateTime('resumed_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('category_id');
+            $table->unsignedBigInteger('priority_id');
+            $table->unsignedBigInteger('status_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
+            $table->foreign('priority_id')->references('id')->on('priorities')->onDelete('cascade');
+            $table->foreign('status_id')->references('id')->on('statuses')->onDelete('cascade');
         });
     }
 
