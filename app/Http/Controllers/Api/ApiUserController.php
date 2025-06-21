@@ -56,13 +56,12 @@ class ApiUserController extends Controller
             $user = auth()->user();
             $validatedData = $request->validated();
 
-            // Usa array_key_exists per controllare la presenza del campo password
-            if (array_key_exists('password', $validatedData)) {
-                $validatedData["password"] = Hash::make($validatedData["password"]);
+            // Miglior gestione della password: aggiorna solo se presente e non vuota
+            if (array_key_exists('password', $validatedData) && !empty($validatedData['password'])) {
+                $validatedData['password'] = Hash::make($validatedData['password']);
             } else {
-                unset($validatedData["password"]);
+                unset($validatedData['password']);
             }
-
             $user->update($validatedData);
             $user->makeHidden(['password']);
 
