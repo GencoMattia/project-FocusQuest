@@ -20,7 +20,7 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login', 'refresh']]);
     }
 
-    public function login(LoginRequest $request)
+    public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
 
@@ -64,7 +64,7 @@ class AuthController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function refresh() {
-        return $this->respondWithToken(auth()->refresh());
+        return $this->respondWithToken(JWTAuth::parseToken()->refresh());
     }
 
     /**
@@ -78,7 +78,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'expires_in' => JWTAuth::factory()->getTTL() * 60
         ]);
     }
 }

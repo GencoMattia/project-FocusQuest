@@ -7,6 +7,7 @@ use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class ApiUserController extends Controller
 {
@@ -43,7 +44,7 @@ class ApiUserController extends Controller
 
     public function show() {
         $user = auth()->user();
-
+        $user->makeHidden(['password']);
         return response()->json([
             "message" => "User profile retrieved successfully",
             "user" => $user,
@@ -53,16 +54,17 @@ class ApiUserController extends Controller
     public function update(UpdateUserRequest $request) {
         try {
             $user = auth()->user();
-
             $validatedData = $request->validated();
 
-            if ($request->filled("password")) {
-                $validatedData["password"] = bcrypt($validatedData["password"]);
+            // Usa array_key_exists per controllare la presenza del campo password
+            if (array_key_exists('password', $validatedData)) {
+                $validatedData["password"] = Hash::make($validatedData["password"]);
             } else {
                 unset($validatedData["password"]);
             }
 
             $user->update($validatedData);
+            $user->makeHidden(['password']);
 
             return response()->json([
                 "message" => "User profile updated successfully",
@@ -71,7 +73,7 @@ class ApiUserController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to update user profile',
-                'error' => $e->getMessage()
+                'error' => app()->environment('production') ? 'Internal server error' : $e->getMessage()
             ], 500);
         }
     }

@@ -25,7 +25,8 @@ class UpdateUserRequest extends FormRequest
             "name"=>'required|min:3|max:50',
             "surname"=>'required|min:3|max:50',
             "email"=>'required|email|min:3',
-            "password"=>'required|min:8'
+            // Password opzionale, almeno 8 caratteri se presente
+            "password"=>'nullable|min:8',
         ];
     }
 }
