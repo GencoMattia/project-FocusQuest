@@ -27,7 +27,7 @@ class ApiUserController extends Controller
                 'name' => $validatedData['name'],
                 'surname' => $validatedData['surname'],
                 'email' => $validatedData['email'],
-                'password' => bcrypt($validatedData['password']),
+                'password' => Hash::make($validatedData['password']),
             ]);
 
             return response()->json([

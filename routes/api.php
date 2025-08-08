@@ -4,7 +4,6 @@ use App\Http\Controllers\Api\ApiMomentController;
 use App\Http\Controllers\Api\ApiTaskController;
 use App\Http\Controllers\Api\ApiUserController;
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
-use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -63,10 +62,10 @@ Route::group([
     Route::get('/form-data', [ApiTaskController::class, 'getFormData'])->name('get-task-form-data');
     Route::get('/top-priority', [ApiTaskController::class, 'getTopPriorityTask'])->name('user.priority.task');
     Route::get('/suggest-tasks', [ApiTaskController::class, 'suggestTasks'])->name('user.suggest.tasks');
-    Route::get('/{id}/show', [ApiTaskController::class, 'show'])->name('show.task');
+    Route::get('/{task}/show', [ApiTaskController::class, 'show'])->name('show.task');
 
     // Update
-    Route::patch('/{id}/status', [ApiTaskController::class, 'modifyTaskStatus'])->name('modify.task.status');
+    Route::patch('/{task}/status', [ApiTaskController::class, 'modifyTaskStatus'])->name('modify.task.status');
 });
 
 // Moment-related routes, protected by JWT authentication
@@ -75,7 +74,7 @@ Route::group([
     'prefix' => 'moments'
 ], function () {
     // Create
-    Route::post('/tasks/{id}/create', [ApiMomentController::class, 'store'])->name('create.new.moment');
+    Route::post('/tasks/{task}/moments', [ApiMomentController::class, 'store'])->name('create.new.moment');
 
     // Read
     Route::get('/form-data', [ApiMomentController::class, 'getFormData'])->name('get-moment-form-data');

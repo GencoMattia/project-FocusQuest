@@ -8,34 +8,28 @@ use App\Models\Category;
 use App\Models\Priority;
 use App\Models\Status;
 use App\Models\Task;
-use App\Models\Pause;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
-use function PHPUnit\Framework\isNull;
-
 class ApiTaskController extends Controller
 {
-    public function show($id)
+    private const STATUS_NEW = 1;
+    private const STATUS_IN_PROGRESS = 2;
+    private const STATUS_COMPLETED = 3;
+    private const STATUS_PAUSED = 4;
+
+    public function show(Task $task)
     {
-
-        $user_id = auth()->user()->id;
-        $task = Task::where('user_id', '=',  $user_id)
-            ->where("id", $id)
-            ->with(['priority', 'status', 'category', 'moments'])
-            ->first();
-
-        if ($task) {
-            return response()->json([
-                'message' => 'success',
-                'task' => $task
-            ]);
-        } else {
-            return response()->json([
-                'message' => 'Task non trovata',
-            ], 404);
+        if ($task->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Not Found'], 404);
         }
+
+        $task->load(['priority', 'status', 'category', 'moments']);
+
+        return response()->json([
+            'message' => 'success',
+            'task' => $task
+        ]);
     }
 
     public function store(CreateNewTaskRequest $request)
@@ -51,7 +45,7 @@ class ApiTaskController extends Controller
             'user_id' => auth()->id(),
             'category_id' => $data['category_id'],
             'priority_id' => $data['priority_id'],
-            'status_id' => 1,
+            'status_id' => self::STATUS_NEW,
             'deadline' => $data["deadline"] ?? now()->toDateString(),
         ]);
 
@@ -61,9 +55,7 @@ class ApiTaskController extends Controller
     public function getUserTask()
     {
         $authenticated_user_id = auth()->user()->id;
-        $tasks = Task::with('priority')
-            ->with('status')
-            ->with('category')
+        $tasks = Task::with(['priority','status','category'])
             ->where('user_id', $authenticated_user_id)
             ->get();
 
@@ -109,25 +101,29 @@ class ApiTaskController extends Controller
     }
 
 
-    public function modifyTaskStatus(Request $request)
+    public function modifyTaskStatus(Request $request, Task $task)
     {
         $data = $request->validate([
             'status_id' => 'required|integer|exists:statuses,id',
-            'task_id' => 'required|integer|exists:tasks,id'
         ]);
 
-        $task = Task::findOrFail($data['task_id']);
-        $status = $data['status_id'];
+        if ($task->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Not Found'], 404);
+        }
+
+        $status = (int) $data['status_id'];
 
         //! AVVIO
-        if ($status == 2) {
+        if ($status === self::STATUS_IN_PROGRESS) {
 
             //? se esistono pause
-            if ($task->number_of_pauses>=1) {
+            if ((int)($task->number_of_pauses ?? 0) >= 1) {
                 $task->resumed_at = now();
-                $total_rest_time = $task->resumed_at->diffInMinutes($task->paused_at);
-                $task->rest_time += $total_rest_time;
-                $rest_time_message = 'Tutto funziona';
+                // paused_at may be null for data inconsistencies
+                if ($task->paused_at) {
+                    $total_rest_time = $task->resumed_at->diffInMinutes($task->paused_at);
+                    $task->rest_time = (int)($task->rest_time ?? 0) + $total_rest_time;
+                }
 
                 $task->status_id = $status;
                 $task->save();
@@ -136,7 +132,6 @@ class ApiTaskController extends Controller
                     'message' => 'Task riavviata',
                     'task' => $task,
                     'task_rest_time'=> $task->rest_time,
-                    'message'=> $rest_time_message
                 ]);
             }
             else {
@@ -153,10 +148,10 @@ class ApiTaskController extends Controller
 
 
         //! PAUSA
-        if ($status == 4) {
+        if ($status === self::STATUS_PAUSED) {
             $task->paused_at = now();
             $task->status_id = $status;
-            $task->number_of_pauses++;
+            $task->number_of_pauses = (int)($task->number_of_pauses ?? 0) + 1;
             $task->save();
 
             return response()->json([
@@ -167,7 +162,7 @@ class ApiTaskController extends Controller
         }
 
         //! COMPLETATA
-        if ($status == 3) {
+        if ($status === self::STATUS_COMPLETED) {
             $task->ended_at = now();
             $task->status_id = $status;
             $task->save();
@@ -176,9 +171,11 @@ class ApiTaskController extends Controller
             if ($task->started_at) {
 
                 //**! SE ESISTONO PAUSE */
-                if ($task->number_of_pauses>=1) {
+                if ((int)($task->number_of_pauses ?? 0) >= 1) {
 
                     $total_time_with_pauses = Carbon::parse($task->ended_at)->diffInMinutes($task->started_at);
+                    $pause_minutes = (int)($task->rest_time ?? 0);
+                    $effective_time = max(0, $total_time_with_pauses - $pause_minutes);
 
                     if ($task->estimated_time > $effective_time) {
                         $earned_time = $task->estimated_time - $effective_time;
@@ -188,15 +185,14 @@ class ApiTaskController extends Controller
                         $effective_time_message = 'Ci hai messo di più di quanto pensavi! ' . 'Ci hai messo ' . $earned_time . ' minuti in più';
                     }
 
-                    $task->status_id = $status;
                     $task->effective_time = $effective_time;
                     $task->save();
 
                     return response()->json([
                         'message' => 'Task completata con pause',
                         'total_task_time' => $this->formatTime($total_time_with_pauses),
+                        'total_pause_time' => $this->formatTime($pause_minutes),
                         'effective_task_time' => $this->formatTime($effective_time),
-                        // 'total_pause_time' => $this->formatTime($total_pause_time),
                         'effective_time_message' => $effective_time_message,
                         'task' => $task
                     ]);
@@ -217,7 +213,6 @@ class ApiTaskController extends Controller
                     }
 
                     //**Aggiorno lo stato della task */
-                    $task->status_id = $status;
                     $task->effective_time = $effective_time;
                     $task->save();
 
@@ -231,8 +226,8 @@ class ApiTaskController extends Controller
             }
         }
 
-        $task->status_id = $status;
-        $task->save();
+    $task->status_id = $status;
+    $task->save();
 
         return response()->json([
             'message' => 'status updated successfully',

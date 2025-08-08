@@ -15,15 +15,15 @@ class Moment extends Model
         'task_id',
     ];
 
-    public function momentstype(){
-        return $this->belongsTo(MomentsType::class);
+    public function momentsType(){
+        return $this->belongsTo(MomentsType::class, 'moments_type_id');
     }
 
     public function emotion(){
         return $this->belongsTo(Emotion::class);
     }
 
-    public function tasks(){
+    public function task(){
         return $this->belongsTo(Task::class);
     }
 }
