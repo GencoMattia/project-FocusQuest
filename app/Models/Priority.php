@@ -13,7 +13,14 @@ class Priority extends Model
         'name', 'color', 'level', 'description'
     ];
 
+    /**
+     * @deprecated Use tasks() instead.
+     */
     public function categories(){
+        return $this->hasMany(Task::class);
+    }
+
+    public function tasks(){
         return $this->hasMany(Task::class);
     }
 }

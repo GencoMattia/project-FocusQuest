@@ -22,9 +22,9 @@ class CreateNewMomentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "task_id"=>'required|integer|exists:tasks,id',
-            "name"=>'required|string|min:3',
-            'message'=>'string',
+            // task_id comes from the route parameter
+            "name"=>'required|string|min:3|max:150',
+            'message'=>'nullable|string',
             'emotion_id'=>'required|integer|exists:emotions,id',
             'moments_type_id'=>'required|integer|exists:moments_types,id'
         ];
@@ -38,13 +38,10 @@ class CreateNewMomentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'task_id.required' => 'Il campo "Task ID" è obbligatorio.',
-            'task_id.integer' => 'Il "Task ID" deve essere un numero intero.',
-            'task_id.exists' => 'Il "Task ID" fornito non esiste nel database.',
-
             'name.required' => 'Il nome è obbligatorio.',
             'name.string' => 'Il nome deve essere una stringa.',
             'name.min' => 'Il nome deve contenere almeno :min caratteri.',
+            'name.max' => 'Il nome non può superare :max caratteri.',
 
             'message.string' => 'Il messaggio deve essere una stringa.',
 

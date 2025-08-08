@@ -23,6 +23,18 @@ class Task extends Model
         'effective_time'
     ];
 
+    protected $casts = [
+        'deadline' => 'date',
+        'started_at' => 'datetime',
+        'ended_at' => 'datetime',
+        'paused_at' => 'datetime',
+        'resumed_at' => 'datetime',
+        'estimated_time' => 'integer',
+        'effective_time' => 'integer',
+        'rest_time' => 'integer',
+        'number_of_pauses' => 'integer',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -59,6 +71,9 @@ class Task extends Model
             if (empty($task->deadline)) {
                 $task->deadline = now()->toDateString();
             }
+            // default counters to 0
+            $task->number_of_pauses = $task->number_of_pauses ?? 0;
+            $task->rest_time = $task->rest_time ?? 0;
         });
     }
 }
